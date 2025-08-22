@@ -10,9 +10,9 @@ COPY . .
 
 FROM python:3.10.17-alpine3.21 as runtime
 
-WORKDIR /app
-
 RUN useradd -m appuser
+
+WORKDIR /app
 
 COPY --from=builder /app /app
 
