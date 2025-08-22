@@ -1,19 +1,20 @@
-FROM python:3.10.17-alpine3.21 as builder
+# Stage 1: Build
+FROM python:3.11-slim as builder
 
 WORKDIR /app
 
-COPY pyproject.toml .
+COPY pyproject.toml ./
 
 RUN pip install .[test]
 
 COPY . .
 
-FROM python:3.10.17-alpine3.21 as runtime
+# Stage 2: Production image
+FROM python:3.11-slim
+
+RUN useradd -m appuser
 
 WORKDIR /app
-
-RUN adduser -D -h /home/appuser appuser
-
 COPY --from=builder /app /app
 
 RUN pip install --no-cache-dir .
