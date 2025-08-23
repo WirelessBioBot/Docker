@@ -69,7 +69,7 @@ jobs:
             sleep 5
           podman run --replace -d \
           --name myapp \
-          -p 80:8115 \
+          -p 8115:80 \
           -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@localhost:5432/kubsu \
           myapp:latest \
           uvicorn src.main:app --host 0.0.0.0 --port 8115'
