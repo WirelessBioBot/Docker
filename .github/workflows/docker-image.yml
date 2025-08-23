@@ -57,10 +57,16 @@ jobs:
                 -p ${{ secrets.SSH_PORT }} \
                 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
             "podman load && \
-            podman rm myapp   || true && \
+             podman rm myapp || true && \
              podman tag myapp:latest myapp:latest && \
+             podman run --rm \
+               --network host \
+               -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@db:5432/kubsu \
+               myapp:latest \
+               alembic upgrade head && \
              podman run -d \
                --name myapp \
                --network host \
+               -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@db:5432/kubsu \
                myapp:latest \
                uvicorn src.main:app --host 0.0.0.0 --port 8115"
