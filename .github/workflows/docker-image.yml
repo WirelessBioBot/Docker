@@ -69,7 +69,6 @@ jobs:
             sleep 5
           podman run --replace -d \
           --name myapp \
-          --network host \
           -p 8115:8115 \
           -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@localhost:5432/kubsu \
           myapp:latest \
