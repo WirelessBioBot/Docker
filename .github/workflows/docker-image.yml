@@ -56,17 +56,21 @@ jobs:
             ssh -o StrictHostKeyChecking=no \
                 -p ${{ secrets.SSH_PORT }} \
                 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "podman load && \
-             podman rm myapp || true && \
-             podman tag myapp:latest myapp:latest && \
-             podman run --rm \
-               --network host \
-               -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@db:5432/kubsu \
-               myapp:latest \
-               alembic upgrade head && \
-             podman run -d \
-               --name myapp \
-               --network host \
-               -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@db:5432/kubsu \
-               myapp:latest \
-               uvicorn src.main:app --host 0.0.0.0 --port 8115"
+            'set -eux podman load
+
+            podman volume create pg_data || true
+              podman run --replace -d \
+          --name db \
+          --network host \
+          -e POSTGRES_DB=kubsu \
+          -e POSTGRES_USER=kubsu \
+          -e POSTGRES_PASSWORD=kubsu \
+          -v pg_data:/var/lib/postgresql/data \
+          postgres:16
+            sleep 5
+          podman run --replace -d \
+          --name myapp \
+          --network host \
+          -e DATABASE_URL=postgresql+psycopg://kubsu:kubsu@localhost:5432/kubsu \
+          myapp:latest \
+          uvicorn src.main:app --host 0.0.0.0 --port 8115'
