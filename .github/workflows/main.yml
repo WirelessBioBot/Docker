@@ -1,0 +1,16 @@
+name: Learning
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build docker image
+        run: docker build -t application .
+      - name: Run docker container
+        run: docker run application
