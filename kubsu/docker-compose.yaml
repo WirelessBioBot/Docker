@@ -12,21 +12,21 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      # для постоянного хранения данных
       - db-data:/var/lib/postgresql/data
-      # дамп прокатится единоразово при инициализации
       - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
 
   api:
     build: ../
-    restart: always
     depends_on:
-      condition: service_healthy
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://kubsu:kubsu@db:5432/kubsu
     command: >
-      sh -c '
-        export PGPASSWORD=kubsu &&
-        export DATABASE_URL=postgresql+psycopg2://kubsu:kubsu@db:5432/kubsu &&
-        exec gunicorn src.main:app -k uvicorn.workers.UvicornWorker -w ${UVICORN_WORKERS:-2} -b 0.0.0.0:8115'
+      uvicorn src.main:app
+      --host 0.0.0.0 --port 8115
+    ports:
+      - "8115:8115"
   
 volumes:
   db-data:
