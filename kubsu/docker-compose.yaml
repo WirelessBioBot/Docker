@@ -22,6 +22,11 @@ services:
     restart: always
     depends_on:
       condition: service_healthy
+    command: >
+      sh -c '
+        export PGPASSWORD=kubsu &&
+        export DATABASE_URL=postgresql+psycopg2://kubsu:kubsu@db:5432/kubsu &&
+        exec gunicorn src.main:app -k uvicorn.workers.UvicornWorker -w ${UVICORN_WORKERS:-2} -b 0.0.0.0:8115'
   
 volumes:
   db-data:
